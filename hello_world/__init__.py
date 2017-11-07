@@ -16,3 +16,4 @@ DEFAULT_CONFIG = {
 def register_blueprint(app, config=None):
     from .endpoints import bp
     app.register_blueprint(bp)
+    return bp
