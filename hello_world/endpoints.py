@@ -25,7 +25,8 @@ class Greeting(webserver.LimeResource):
 
         return {
             'message': 'Hello, there are {} {} available'.format(
-                LimeType.get_all().count, LimeType.localname.plural.lower())
+                LimeType.get_all().count, LimeType.localname.plural.lower()),
+            'version': 'v0.0.1'
         }
 
 
