@@ -1,3 +1,0 @@
-{
-  "hello_world/endpoints/deal_test.py::test_create_deal_returns_404_if_invalid_company": true
-}
