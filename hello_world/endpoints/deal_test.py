@@ -8,78 +8,6 @@ import lime_type
 import pytest
 
 
-@pytest.fixture
-def limetypes():
-    """The limetypes of the core database
-    You can change these, or create your own by twiddling with the YAML based
-    DSL format for limetypes.
-    """
-    def create_limetypes():
-        return lime_type.create_limetypes_from_dsl(dsl.dsl)
-
-    return create_limetypes
-
-
-@pytest.fixture
-def database(limetypes, monkeypatch):
-    """An in-memory empty Lime database with the core database limetypes"""
-    database = lime_test.db.create_database_with_limetypes(
-        monkeypatch,
-        limetypes=limetypes(),
-        limename='myapp',
-        sqlname='myapp')
-    return database
-
-
-@pytest.fixture
-def limeapp(database, limetypes, monkeypatch):
-    """A Lime application with a user/coworker defined"""
-    app = lime_test.app.create_app(monkeypatch, database, limetypes)
-    user = lime_test.db.create_and_add_user(database=database,
-                                            fullname='Kenny Starfighter',
-                                            username='kenny',
-                                            password='kenny')
-    app.unit_of_work()
-
-    # TODO: Make it possible to create a coworker with this hack
-    coworker = app.limetypes.coworker(
-        firstname='Kenny',
-        lastname='Starfighter',
-        name='Kenny Starfighter',
-        username=user.id,
-        _from_row=True
-    )
-
-    uow = app.unit_of_work()
-    idx = uow.add(coworker)
-    res = uow.commit()
-
-    app._coworker = res.get(idx)
-
-    return app
-
-
-@pytest.fixture
-def webapp(limeapp, database, monkeypatch):
-    """An in-memory web application where you're authenticated as a user"""
-    web_app = lime_test.web_app.create_web_app(database, monkeypatch)
-
-    return lime_test.web_app.create_authenticated_web_client(web_app=web_app,
-                                                             app=limeapp,
-                                                             username='kenny',
-                                                             password='kenny')
-
-
-@pytest.fixture
-def acme_company(limeapp):
-    """A company that gets added to `limeapp`"""
-    uow = limeapp.unit_of_work()
-    acme = limeapp.limetypes.company(name='Acme Inc.')
-    acme_idx = uow.add(acme)
-    res = uow.commit()
-    return res.get(acme_idx)
-
-
 def test_create_deal_returns_deal_id(limeapp, webapp, acme_company):
 
     data = dict(
@@ -169,3 +97,75 @@ def test_create_deal_returns_404_if_invalid_company(limeapp, webapp):
                       headers=headers)
 
     assert res.status_code == 404
+
+
+@pytest.fixture
+def limetypes():
+    """The limetypes of the core database
+    You can change these, or create your own by twiddling with the YAML based
+    DSL format for limetypes.
+    """
+    def create_limetypes():
+        return lime_type.create_limetypes_from_dsl(dsl.dsl)
+
+    return create_limetypes
+
+
+@pytest.fixture
+def database(limetypes, monkeypatch):
+    """An in-memory empty Lime database with the core database limetypes"""
+    database = lime_test.db.create_database_with_limetypes(
+        monkeypatch,
+        limetypes=limetypes(),
+        limename='myapp',
+        sqlname='myapp')
+    return database
+
+
+@pytest.fixture
+def limeapp(database, limetypes, monkeypatch):
+    """A Lime application with a user/coworker defined"""
+    app = lime_test.app.create_app(monkeypatch, database, limetypes)
+    user = lime_test.db.create_and_add_user(database=database,
+                                            fullname='Kenny Starfighter',
+                                            username='kenny',
+                                            password='kenny')
+    app.unit_of_work()
+
+    # TODO: Make it possible to create a coworker with this hack
+    coworker = app.limetypes.coworker(
+        firstname='Kenny',
+        lastname='Starfighter',
+        name='Kenny Starfighter',
+        username=user.id,
+        _from_row=True
+    )
+
+    uow = app.unit_of_work()
+    idx = uow.add(coworker)
+    res = uow.commit()
+
+    app._coworker = res.get(idx)
+
+    return app
+
+
+@pytest.fixture
+def webapp(limeapp, database, monkeypatch):
+    """An in-memory web application where you're authenticated as a user"""
+    web_app = lime_test.web_app.create_web_app(database, monkeypatch)
+
+    return lime_test.web_app.create_authenticated_web_client(web_app=web_app,
+                                                             app=limeapp,
+                                                             username='kenny',
+                                                             password='kenny')
+
+
+@pytest.fixture
+def acme_company(limeapp):
+    """A company that gets added to `limeapp`"""
+    uow = limeapp.unit_of_work()
+    acme = limeapp.limetypes.company(name='Acme Inc.')
+    acme_idx = uow.add(acme)
+    res = uow.commit()
+    return res.get(acme_idx)
