@@ -1,29 +1,30 @@
 # hello-world
 
-``Awesomeness in a package``
+_An example Lime CRM plugin_
 
-## Tools for development
+This is an example plugin that implements:
 
-## Run Tests
+* A custom endpoint that creates a deal, connects it to a company and a coworker, and creates a todo.
+* An event handler that...
 
-```
-$ ./manage.py test
-```
+## Running tests
 
-## Check for PEP8 violations::
-
+On Linux:
 
 ```
-$ ./manage.py flake
+$ make test
 ```
 
-## View test coverage::
-```
-$ ./manage.py coverage
-```
-
-## See what else you can do::
+On Windows:
 
 ```
-$ ./manage.py --help
+C:\src\hello-world> python -m venv venv
+C:\src\hello-world> venv\Scripts\activate
+C:\src\hello-world> python manage.py test
+```
+
+# Installation
+
+```
+$ limeplug install limeplugins/hello-world
 ```
