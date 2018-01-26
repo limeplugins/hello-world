@@ -71,6 +71,20 @@ class Deal(webserver.LimeResource):
         # Retrieve the updated deal so we can get its ID.
         deal = res.get(deal_idx)
 
+        # Send a custom event, notifying the world about this deal
+        self.application.publish(identifier='hello-world.deal.created',
+                                 message={
+                                     'deal': {
+                                         'id': deal.id,
+                                         'name': deal.properties.name.value,
+                                         'value': deal.properties.value.value
+                                     },
+                                     'company': {
+                                         'id': company.id,
+                                         'name': company.properties.name.value
+                                     }
+                                 })
+
         # Return a json response with the id of our new deal and a HTTP code
         # indicating that the objects were created successfully.
         return {'id': deal.id}, http.client.CREATED
