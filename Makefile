@@ -23,4 +23,4 @@ pytest:
 .PHONY: ptw
 ptw:
 	@# Start watching file system for changes and re-run tests when a change is detected.
-	docker-compose run app ptw
+	docker-compose run app ptw -- --no-print-logs

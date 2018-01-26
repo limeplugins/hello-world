@@ -1,5 +1,6 @@
 import logging
-# import requests
+import requests
+import lime_config
 
 logger = logging.getLogger(__name__)
 
@@ -8,7 +9,10 @@ def deal(worker, body, message):
     """Summarize your event handlers's functionality here"""
     logger.info('Received message: {}'.format(body))
 
-    # requests.post('https://some.api/deals', json=body)
+    if lime_config.config.plugins.events.call_api:
+        requests.post(lime_config.config.plugins.events.api_url, json=body)
+    else:
+        logger.info('Calling external api is disabled in config')
 
     message.ack()
 

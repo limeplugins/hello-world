@@ -6,7 +6,11 @@ logger = logging.getLogger(__name__)
 def default_config():
     return {
         'todo_note_text': ('Follow up {deal.properties.name.value} with '
-                           '{company.properties.name.value}')
+                           '{company.properties.name.value}'),
+        'events': {
+            'call_api': False,
+            'api_url': 'https://example.com/foo'
+        }
     }
 
 

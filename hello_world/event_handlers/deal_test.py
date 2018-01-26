@@ -5,6 +5,7 @@ import lime_type
 import lime_event_handler.worker
 import kombu
 import pytest
+import requests
 import unittest.mock
 
 
@@ -106,16 +107,24 @@ def acme_company(limeapp):
 
 def test_calls_external_api_on_company_rename(
         limeapp_with_events, worker, acme_company, monkeypatch):
-    mock_post = unittest.mock.MagicMock()
-    monkeypatch.setattr('requests.post', mock_post)
+    monkeypatch.setattr('requests.post', unittest.mock.MagicMock())
 
-    uow = limeapp_with_events.unit_of_work()
-    acme_company.properties.name.value = 'Updated acme'
-    uow.add(acme_company)
-    uow.commit()
+    message = {
+        'deal': {
+            'id': 1001,
+            'name': 'a deal',
+            'value': 10000
+        },
+        'company': {
+            'id': 1001,
+            'name': 'Acme Inc.'
+        }
+    }
 
+    limeapp_with_events.publish(identifier='hello-world.deal.created',
+                                message=message)
     worker.step()
 
-    mock_post.assert_called_once_with(
+    requests.post.assert_called_once_with(
         'https://some.api/company_renamed',
         json={'old_name': 'Acme Inc.', 'new_name': 'Updated acme'})
