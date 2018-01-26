@@ -1,6 +1,7 @@
+import http.client
+import lime_config
 import lime_webserver.webserver as webserver
 import logging
-import http.client
 import webargs.fields as fields
 from webargs.flaskparser import use_args
 from ..endpoints import api
@@ -59,8 +60,8 @@ class Deal(webserver.LimeResource):
         uow.add(coworker)
 
         todo = self.application.limetypes.todo()
-        todo.properties.note.value = 'Follow up {} with {}'.format(
-            deal.properties.name.value, company.properties.name.value)
+        note = lime_config.config['plugins']['hello_world']['todo_note_text']
+        todo.properties.note.value = note.format(deal=deal, company=company)
         todo.properties.deal.attach(deal)
         uow.add(todo)
 
