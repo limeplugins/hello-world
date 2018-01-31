@@ -9,8 +9,9 @@ def deal(worker, body, message):
     """Summarize your event handlers's functionality here"""
     logger.info('Received message: {}'.format(body))
 
-    if lime_config.config.plugins.events.call_api:
-        requests.post(lime_config.config.plugins.events.api_url, json=body)
+    if lime_config.config.plugins.hello_world.events.call_api:
+        requests.post(lime_config.config.plugins.hello_world.events.api_url,
+                      json=body)
     else:
         logger.info('Calling external api is disabled in config')
 

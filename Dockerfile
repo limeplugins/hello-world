@@ -5,11 +5,12 @@ CMD sh
 WORKDIR /lime
 COPY . /lime
 
-# The copying of timezone info is a hack to solve a bug in pytz regarding
-# name conflict for local timezone
-RUN pip3 install --no-cache-dir -r requirements_dev.txt \
-    && if [ -f /usr/local/lib/python3.5/site-packages/pytzdata/zoneinfo/localtime ]; \
-       then cp /usr/local/lib/python3.5/site-packages/pytzdata/zoneinfo/localtime \
-               /usr/local/lib/python3.5/site-packages/pytzdata/zoneinfo/local; fi
+RUN pip3 install --no-cache-dir -r requirements_dev.txt
+
+# Set timezone to Sweden.
+ENV TZ=Europe/Stockholm
+RUN apk --no-cache add tzdata \
+    && cp /usr/share/zoneinfo/$TZ /etc/localtime \
+    && echo $TZ > /etc/timezone
 
 RUN limeplug install .

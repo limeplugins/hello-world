@@ -7,6 +7,7 @@ import kombu
 import pytest
 import requests
 import unittest.mock
+import lime_config
 
 
 @pytest.fixture
@@ -89,8 +90,7 @@ def worker(limeapp, message_queue_connection):
     worker = lime_event_handler.worker.Worker(
         connection=message_queue_connection,
         applications=[limeapp.identifier])
-    config = {}
-    worker.load_plugins(config=config)
+    worker.load_plugins(config=lime_config.config)
     worker.step()
     return worker
 
@@ -105,26 +105,20 @@ def acme_company(limeapp):
     return res.get(acme_idx)
 
 
-def test_calls_external_api_on_company_rename(
+def test_calls_external_api_on_deal_created(
         limeapp_with_events, worker, acme_company, monkeypatch):
     monkeypatch.setattr('requests.post', unittest.mock.MagicMock())
 
-    message = {
-        'deal': {
-            'id': 1001,
-            'name': 'a deal',
-            'value': 10000
-        },
-        'company': {
-            'id': 1001,
-            'name': 'Acme Inc.'
-        }
-    }
+    monkeypatch.setattr(
+        'lime_config.config.plugins.hello_world.events.call_api',
+        True)
+
+    message = {'test': True}
 
     limeapp_with_events.publish(identifier='hello-world.deal.created',
                                 message=message)
     worker.step()
 
     requests.post.assert_called_once_with(
-        'https://some.api/company_renamed',
-        json={'old_name': 'Acme Inc.', 'new_name': 'Updated acme'})
+        'https://example.com/foo',
+        json=message)
