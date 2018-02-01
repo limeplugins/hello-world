@@ -5,7 +5,7 @@ _An example Lime CRM plugin_
 This is an example plugin that implements:
 
 * A custom endpoint that creates a deal, connects it to a company and a coworker, and creates a todo.
-* An event handler that...
+* An event handler that calls a configurable webhook upon receiving an event about the new deal.
 
 ## Running tests
 
